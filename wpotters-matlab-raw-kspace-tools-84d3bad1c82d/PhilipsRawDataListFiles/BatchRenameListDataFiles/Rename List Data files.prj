@@ -1,0 +1,71 @@
+<deployment-project plugin="plugin.apptool" plugin-version="1.0">
+  <configuration build-checksum="1727985981" file="/Users/wouterpotters/Documents/Promotie/Matlab_other_tools/loadRawKspacePhilips/Rename List Data files.prj" location="/Users/wouterpotters/Documents/Promotie/Matlab_other_tools/loadRawKspacePhilips" name="Rename List Data files" target="target.mlapps" target-name="Package App">
+    <param.appname>Rename List Data files</param.appname>
+    <param.authnamewatermark>Wouter Potters</param.authnamewatermark>
+    <param.email>w.v.potters@amc.nl</param.email>
+    <param.company>Academic Medical Center, Amsterdam</param.company>
+    <param.icon />
+    <param.icons />
+    <param.summary>Sort List Data files asks the user for a folder.
+All list and data files (philips raw files) are renamed to the name in the list file.</param.summary>
+    <param.description />
+    <param.screenshot />
+    <param.version>1.0</param.version>
+    <param.products.name>
+      <item>MATLAB</item>
+    </param.products.name>
+    <param.products.id>
+      <item>'1'</item>
+    </param.products.id>
+    <param.products.version>
+      <item>8.4</item>
+    </param.products.version>
+    <param.platforms />
+    <param.output>${PROJECT_ROOT}/Rename List Data files.mlappinstall</param.output>
+    <param.guid>efc6a6cd-4936-49ce-96e2-d523ee1211da</param.guid>
+    <unset>
+      <param.icon />
+      <param.icons />
+      <param.description />
+      <param.screenshot />
+      <param.version />
+      <param.platforms />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}/renameRawDataFiles.m</file>
+    </fileset.main>
+    <fileset.depfun />
+    <fileset.resources />
+    <fileset.package />
+    <build-deliverables>
+      <file location="/Users/wouterpotters/Documents/Promotie/Matlab_other_tools/loadRawKspacePhilips" name="Rename List Data files.mlappinstall" optional="false">/Users/wouterpotters/Documents/Promotie/Matlab_other_tools/loadRawKspacePhilips/Rename List Data files.mlappinstall</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>/Applications/MATLAB_R2014b.app</root>
+      <toolboxes>
+        <toolbox name="matlabcoder" />
+      </toolboxes>
+      <toolbox>
+        <matlabcoder>
+          <enabled>true</enabled>
+        </matlabcoder>
+      </toolbox>
+    </matlab>
+    <platform>
+      <unix>true</unix>
+      <mac>true</mac>
+      <windows>false</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>10.9.3</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>maci64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
