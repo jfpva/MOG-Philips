@@ -1,5 +1,5 @@
 function[AllData]=read_raw_data_philips(path,filename)
-filepath=fullfile(string(path),string(filename));
+filepath=fullfile(char(path),char(filename));
 P=loadRawKspace(filepath);
 % Get number of signal averages
 % Check complex data vector type if data is equal to 'STD', standard data
