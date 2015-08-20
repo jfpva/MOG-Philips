@@ -1,13 +1,31 @@
 function[AllData]=read_raw_data_philips(path,filename)
+
 filepath=fullfile(char(path),char(filename));
+
 P=loadRawKspace(filepath);
+
 % Get number of signal averages
 % Check complex data vector type if data is equal to 'STD', standard data
 % vector (image data or spectroscopy data).
 aver = unique( P.aver( strcmp( P.typ, 'STD' ) ) );
 NumAverages = numel( aver );
-% Reformat for MOG per signal average
 
+% Read encoding velocity from .list file
+% NOTE: scan name ends in '_v100', indicating encoding velocity in cm/s
+try
+    listText = fileread(filepath);
+    R        = regexp( listText, '# Scan name   : .+_v(?<venc>\d+)', 'names' );
+    venc     = str2double( R.venc );
+catch
+    venc = NaN;
+end
+
+
+% Function and variables to remove oversampling in frequency direction
+remove_freq_oversampling = @( im, p ) im((floor(size(im,1)*p/2)+1):(floor(size(im,1)*(1-p/2))),:,:,:,:,:,:);
+kxOversamplePercent = ( P.kspace_properties.kx_oversample_factor - 1 ) / P.kspace_properties.kx_oversample_factor;
+
+% Reformat for MOG per signal average
     % mog internal format, for reference:
     %   Data(Rows,Velocity Encodes).Times(Measured Cardiac Phases)
     %   Data(Rows,Velocity Encodes).KSpace(Columns, Coils, Measured Cardiac Phase)
@@ -24,7 +42,7 @@ for iAver = 1:NumAverages,
     rrInterval              = P.rr( indProfile );
     profileTimeSinceTrigger = P.rtop( indProfile );
     
-     newCardCycleIndex       = find( diff( profileTimeSinceTrigger ) < 0 ) + 1;
+    newCardCycleIndex       = find( diff( profileTimeSinceTrigger ) < 0 ) + 1;
 
     triggerTimeSinceStart   = int32( zeros( size( indProfile ) ) );
     triggerTimeSinceStart( newCardCycleIndex ) = rrInterval( newCardCycleIndex );
@@ -48,20 +66,30 @@ for iAver = 1:NumAverages,
         coilNum( iP ) = find( allCoilNum == coil( iP ) );
 
         Data( row(iP), velocityEncode(iP) ).Times( measuredCardiacPhase(iP) ) = profileTimeSinceStart(iP);
-        Data( row(iP), velocityEncode(iP) ).KSpace( :, coilNum(iP), measuredCardiacPhase(iP) ) = P.complexdata{ indProfile( iP ) }';
+
+        ky = P.complexdata{ indProfile( iP ) }';        
+
+        Data( row(iP), velocityEncode(iP) ).KSpace( :, coilNum(iP), measuredCardiacPhase(iP) ) = ky;
 
     end
-    
+        
     for iD = 1:numel(Data)
 
         % MOG requires FFT in readout direction preproccessed
-
-        Data( iD ).KSpace = fftshift( ifft( Data( iD ).KSpace, [] , 1), 1);
+        kSpace = fftshift( ifft( Data( iD ).KSpace, [] , 1), 1);
+        
+        % Remove frequency oversampling
+        kSpace = remove_freq_oversampling( kSpace, kxOversamplePercent );
+  
+        % Replace k-Space
+        Data( iD ).KSpace = kSpace;
 
     end
+    
+% Save to structure
 
- % Save to structure
-
-    AllData(iAver).Data_Properties.Data        = Data;
+    AllData(iAver).Data_Properties.Data             = Data;
+    AllData(iAver).Data_Properties.KSpaceProperties = P.kspace_properties;
+    AllData(iAver).Data_Properties.EncodingVelocity = venc;
 
 end

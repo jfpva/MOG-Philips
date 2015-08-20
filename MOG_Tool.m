@@ -19,7 +19,7 @@ while strcmp(restart,'Yes')
         Data_Properties.Protocol='.mat File';
     elseif strcmp(filename(end-4:end),'.list')
         [AllData]=read_raw_data_philips(path,filename);
-        Data_Properties=AllData(1).Data_Properties;
+        Data_Properties=AllData(1).Data_Properties;  % NOTE: only using first of all averages acquired
         Data_Properties.Protocol='.list File';
     end
     Data_Properties.Trial=0;
@@ -81,8 +81,8 @@ while strcmp(restart,'Yes')
                 save(strcat(path,filename(1:(end-4)),'_patched',filename((end-3):end)),'Data')
                 restart=questdlg('*_patched.mat file has been saved. Would you like to reconstruct another file?','Analysis Complete','Yes', 'No', 'Yes');
             elseif strcmp(user_input, 'yes') && strcmp(filename(end-4:end),'.list');
-                AllData(1).Data_Properties.Data=Data_Properties.Data;
-                save(strcat(path,filename(1:(end-5)),'_patched.mat'),'AllData')
+                RWaveTimes = Optimization.RWaveTimes;
+                save(strcat(path,filename(1:(end-5)),'_patched.mat'),'Data_Properties','RWaveTimes') 
                 restart=questdlg('*_patched.mat file has been saved. Would you like to reconstruct another file?','Analysis Complete','Yes', 'No', 'Yes');
             elseif strcmp(user_input, 'no')
                 restart=questdlg('Would you like to reconstruct another file?','Analysis Complete','Yes', 'No', 'Yes');
