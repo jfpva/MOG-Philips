@@ -18,6 +18,11 @@ Images = struct('Magnitude', {}, 'Phase', {});
 
 if strcmp(Data_Properties.DataType{2},'FULL')
     %%% Fourier transform (the FE direction is already done)
+    if isfield( Data_Properties, 'Protocol' ),
+        if strcmp( Data_Properties.Protocol, '.list File' ),
+          KSpace = ifft(fftshift(fft(KSpace,[],1),1),[],1);  % jfpva: correct Philips data
+        end
+    end
     TempImages = fftshift(ifft(fftshift(KSpace,1),[],1),1);
     
     if strcmp(Data_Properties.DataType{1},'CINE')
