@@ -76,17 +76,16 @@ if isnan(dx),
     if strcmp( Data_Properties.Protocol, '.list File' ),
    
         % Read voxel dimensions from .txt scan protocol file
+        
         [ protocolTxtFileName, protocolTxtFileDir ] = uigetfile( '*.txt', 'Select protocol file' );
         protocolTxtFilePath = fullfile( protocolTxtFileDir, protocolTxtFileName );
 
         try
 
             protocolText = fileread(protocolTxtFilePath);
-            X            = regexp( protocolText, 'Voxel size   RL \(mm\) =\s+(?<dx>\w[0-9.]+);', 'names' );
-            Split        = regexp( protocolText, 'Voxel size   RL \(mm\) =\s+(?<dx>\w[0-9.]+);', 'split' );
-            Y            = regexp( Split{2}, '.+AP \(mm\) =\s+(?<dy>\w[0-9.]+);', 'names' );
-            dx = str2double(X.dx);
-            dy = str2double(Y.dy);
+            N            = regexp( protocolText, 'ACQ voxel MPS \(mm\) =\s+"(?<dx>\w[0-9.]+)\s+/\s+(?<dy>\w[0-9.]+)\s+/\s+(?<dz>\w[0-9.]+)"', 'names' );
+            dx           = str2double(N.dx);
+            dy           = str2double(N.dy);
 
         catch
 
@@ -100,14 +99,6 @@ if isnan(dx),
         
     end
     
-end
-
-if isnan(dy),
-    
-    % Assume dy is the same as dx
-    dy = dx;
-    warning('Voxel dimension dy not specified\n   using dy = %g\n\n',dy),
-
 end
 
 
