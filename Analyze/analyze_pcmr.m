@@ -1,4 +1,4 @@
-function varargout = analyze_pcmr( patchedMatFilePath, dx, dy, nFrames, doRectify, doAlignSystole )
+function varargout = analyze_pcmr( patchedMatFilePath, protocolTxtFilePath, dx, dy, venc, nFrames, doRectify, doAlignSystole )
 %ANALYSE_PCMR 
 % 
 
@@ -18,13 +18,27 @@ while exist( patchedMatFilePath, 'file' ) ~= 2,
     [ patchedMatFileName, patchedMatFileDir ] = uigetfile( '*_patched.mat', 'Select patched data file' );
     patchedMatFilePath = fullfile( patchedMatFileDir, patchedMatFileName );
 end
-    
+
+if ~exist( 'protocolTxtFilePath', 'var' ),
+   [ protocolTxtFileName, protocolTxtFileDir ] = uigetfile( '*.txt', 'Select protocol file' );
+   protocolTxtFilePath = fullfile( protocolTxtFileDir, protocolTxtFileName );
+end
+
+while exist( protocolTxtFilePath, 'file' ) ~= 2,
+    [ protocolTxtFileName, protocolTxtFileDir ] = uigetfile( '*.txt', 'Select protocol file' );
+    protocolTxtFilePath = fullfile( protocolTxtFileDir, protocolTxtFileName );
+end
+
 if ~exist( 'dx', 'var' ),
     dx = NaN;
 end
 
 if ~exist( 'dy', 'var' ),
     dy = NaN;
+end
+
+if ~exist( 'venc', 'var' ),
+    venc = NaN;
 end
 
 if ~exist( 'nFrames', 'var' ),
@@ -68,32 +82,44 @@ end
 
 % Voxel Dimensions and Encoding Velocity
 
-if isnan(dx),
-
-    dx = 1;
-    dy = 1;
-    venc = 1;
+if isnan(dx) || isnan(dy) || isnan(venc),
     
     if strcmp( Data_Properties.Protocol, '.list File' ),
    
-        % Read voxel dimensions from .txt scan protocol file
+        % Read voxel dimensions from .txt scan protocol file 
         
-        [ protocolTxtFileName, protocolTxtFileDir ] = uigetfile( '*.txt', 'Select protocol file' );
-        protocolTxtFilePath = fullfile( protocolTxtFileDir, protocolTxtFileName );
-
         try
 
             protocolText = fileread(protocolTxtFilePath);
             N1           = regexp( protocolText, 'ACQ voxel MPS \(mm\) =\s+"(?<dx>\w[0-9.]+)\s+/\s+(?<dy>\w[0-9.]+)\s+/\s+(?<dz>\w[0-9.]+)"', 'names' );
-            dx           = str2double(N1.dx);
-            dy           = str2double(N1.dy);
+            if isnan(dx), 
+                dx       = str2double(N1.dx);
+            end
+            if isnan(dy),
+                dy       = str2double(N1.dy);
+            end
             N2           = regexp( protocolText, '\s+PC velocity \(cm/s\) =\s+(?<venc>\d+);', 'names' );
-            venc         = str2double(N2.venc);
+            if isnan(venc),
+                venc     = str2double(N2.venc);
+            end
             
         catch
-
-            warning('Voxel dimensions cannot be read from %s\n   using dx = %g and dy = %g\n',protocolTxtFilePath,dx,dy),
-            warning('Encoding velocity cannot be read from %s\n  using venc = %g\n\n',protocolTxtFilePath,venc),
+            
+            warning('Voxel dimensions cannot be read from %s\n',protocolTxtFilePath),
+            fprintf('   using: ');
+            if isnan(dx),
+                dx = 1;
+                fprintf('dx = %g mm, ',dx),
+            end
+            if isnan(dy),
+                dy = 1;
+                fprintf('dy = %g mm, ',dy),
+            end
+            if isnan(venc),
+                venc = 1;
+                fprintf('venc = %g cm/s ',venc),
+            end
+            fprintf('\n\n')
 
         end
     
@@ -106,8 +132,6 @@ if isnan(dx),
 end
 
 Data_Properties.EncodingVelocity = venc;
-
-% TODO: clean up / separate read-in of different parameters from .txt file
 
 
 %% Reconstruct PC MR Images
@@ -162,8 +186,6 @@ close( hFig ),
 
 %% Compute Velocity and Flow
 
-% TODO: ensure units handled properly
-
 voxelArea = dx * dy;  % mm^2
 
 time = P.FrameTimes;  % ms
@@ -210,13 +232,13 @@ strokeVolume = sum( flow * 1e-3 .* dt );  % ml
 formatSpecTitle  = '%-12s    %-12s    %-12s    %-12s    %-12s\n\n';
 formatSpecValues = '% 12i    % 12.1f    % 12.3f    % 12.3f    % 12.3f\n';
 
-resultTable = cell( 1, length(time) + 1 );
+resultTable = cell( 0 );
 
 resultTable{1} = sprintf( formatSpecTitle, 'Frame', 'Time (ms)', 'Area (mm^2)', 'Vel. (cm/s)', 'Flow (ml/s)' );
 
-for iT = ((1:length(time))+1),
+for iT = 1:length(time),
     
-    resultTable{iT} = sprintf( formatSpecValues, iT, time(iT), roiArea(iT), velMean(iT), flow(iT) );
+    resultTable{end+1} = sprintf( formatSpecValues, iT, time(iT), roiArea(iT), velMean(iT), flow(iT) );
     
 end
 
