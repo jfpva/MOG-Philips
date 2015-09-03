@@ -66,12 +66,13 @@ end
 
 %% Get Missing Information
 
-% Voxel Dimensions
+% Voxel Dimensions and Encoding Velocity
 
 if isnan(dx),
 
     dx = 1;
     dy = 1;
+    venc = 1;
     
     if strcmp( Data_Properties.Protocol, '.list File' ),
    
@@ -83,13 +84,16 @@ if isnan(dx),
         try
 
             protocolText = fileread(protocolTxtFilePath);
-            N            = regexp( protocolText, 'ACQ voxel MPS \(mm\) =\s+"(?<dx>\w[0-9.]+)\s+/\s+(?<dy>\w[0-9.]+)\s+/\s+(?<dz>\w[0-9.]+)"', 'names' );
-            dx           = str2double(N.dx);
-            dy           = str2double(N.dy);
-
+            N1           = regexp( protocolText, 'ACQ voxel MPS \(mm\) =\s+"(?<dx>\w[0-9.]+)\s+/\s+(?<dy>\w[0-9.]+)\s+/\s+(?<dz>\w[0-9.]+)"', 'names' );
+            dx           = str2double(N1.dx);
+            dy           = str2double(N1.dy);
+            N2           = regexp( protocolText, '\s+PC velocity \(cm/s\) =\s+(?<venc>\d+);', 'names' );
+            venc         = str2double(N2.venc);
+            
         catch
 
-            warning('Voxel dimensions cannot be read from %s\n   using dx = %g and dy = %g\n\n',protocolTxtFilePath,dx,dy),
+            warning('Voxel dimensions cannot be read from %s\n   using dx = %g and dy = %g\n',protocolTxtFilePath,dx,dy),
+            warning('Encoding velocity cannot be read from %s\n  using venc = %g\n\n',protocolTxtFilePath,venc),
 
         end
     
@@ -100,6 +104,10 @@ if isnan(dx),
     end
     
 end
+
+Data_Properties.EncodingVelocity = venc;
+
+% TODO: clean up / separate read-in of different parameters from .txt file
 
 
 %% Reconstruct PC MR Images
