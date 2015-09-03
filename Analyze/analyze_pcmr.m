@@ -209,7 +209,7 @@ strokeVolume = sum( flow .* dt );  % ml
 %% Tabulate
 
 formatSpecTitle  = '%-12s    %-12s    %-12s    %-12s    %-12s\n\n';
-formatSpecValues = '% 12i    % 12.1f    % 12.1f    % 12.1f    % 12.1f\n';
+formatSpecValues = '% 12i    % 12.1f    % 12.3f    % 12.3f    % 12.3f\n';
 
 resultTable = cell( 0 );
 
