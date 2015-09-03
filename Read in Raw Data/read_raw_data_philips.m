@@ -10,17 +10,6 @@ P=loadRawKspace(filepath);
 aver = unique( P.aver( strcmp( P.typ, 'STD' ) ) );
 NumAverages = numel( aver );
 
-% Read encoding velocity from .list file
-% NOTE: scan name ends in '_v100', indicating encoding velocity in cm/s
-try
-    listText = fileread(filepath);
-    R        = regexp( listText, '# Scan name   : .+_v(?<venc>\d+)', 'names' );
-    venc     = str2double( R.venc );
-catch
-    venc = NaN;
-end
-
-
 % Function and variables to remove oversampling in frequency direction
 if isfield(P.kspace_properties,'kx_oversample_factor'),
     kxOversamplePercent = ( P.kspace_properties.kx_oversample_factor - 1 ) / P.kspace_properties.kx_oversample_factor;
@@ -29,7 +18,6 @@ else
 end
 remove_freq_oversampling = @( im, p ) im((floor(size(im,1)*p/2)+1):(floor(size(im,1)*(1-p/2))),:,:,:,:,:,:);
   
-
 % Reformat for MOG per signal average
     % mog internal format, for reference:
     %   Data(Rows,Velocity Encodes).Times(Measured Cardiac Phases)
