@@ -210,13 +210,13 @@ strokeVolume = sum( flow * 1e-3 .* dt );  % ml
 formatSpecTitle  = '%-12s    %-12s    %-12s    %-12s    %-12s\n\n';
 formatSpecValues = '% 12i    % 12.1f    % 12.3f    % 12.3f    % 12.3f\n';
 
-resultTable = cell( 0 );
+resultTable = cell( 1, length(time) + 1 );
 
 resultTable{1} = sprintf( formatSpecTitle, 'Frame', 'Time (ms)', 'Area (mm^2)', 'Vel. (cm/s)', 'Flow (ml/s)' );
 
-for iT = 1:length(time),
+for iT = ((1:length(time))+1),
     
-    resultTable{end+1} = sprintf( formatSpecValues, iT, time(iT), roiArea(iT), velMean(iT), flow(iT) );
+    resultTable{iT} = sprintf( formatSpecValues, iT, time(iT), roiArea(iT), velMean(iT), flow(iT) );
     
 end
 
