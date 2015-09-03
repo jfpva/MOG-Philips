@@ -22,8 +22,13 @@ end
 
 
 % Function and variables to remove oversampling in frequency direction
+if isfield(P.kspace_properties,'kx_oversample_factor'),
+    kxOversamplePercent = ( P.kspace_properties.kx_oversample_factor - 1 ) / P.kspace_properties.kx_oversample_factor;
+else
+    kxOversamplePercent = 0;
+end
 remove_freq_oversampling = @( im, p ) im((floor(size(im,1)*p/2)+1):(floor(size(im,1)*(1-p/2))),:,:,:,:,:,:);
-kxOversamplePercent = ( P.kspace_properties.kx_oversample_factor - 1 ) / P.kspace_properties.kx_oversample_factor;
+  
 
 % Reformat for MOG per signal average
     % mog internal format, for reference:
@@ -79,7 +84,9 @@ for iAver = 1:NumAverages,
         kSpace = fftshift( ifft( Data( iD ).KSpace, [] , 1), 1);
         
         % Remove frequency oversampling
-        kSpace = remove_freq_oversampling( kSpace, kxOversamplePercent );
+        if kxOversamplePercent > 0,
+            kSpace = remove_freq_oversampling( kSpace, kxOversamplePercent );
+        end
   
         % Replace k-Space
         Data( iD ).KSpace = kSpace;
