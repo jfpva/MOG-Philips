@@ -202,7 +202,7 @@ flow = vel2flow( velMean, roiArea );
 
 flowMean = mean( flow ) * 60; % ml/min
 
-strokeVolume = sum( flow .* dt );  % ml
+strokeVolume = sum( flow * 1e-3 .* dt );  % ml
 
 
 %% Tabulate
