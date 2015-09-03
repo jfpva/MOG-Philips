@@ -291,9 +291,6 @@ hTextbox = annotation( 'textbox', ...
 
 %% Save Results and Assign Output
 
-% TODO: save results
-% TODO: assign output
-
 if nargout > 0,
     varargout{1} = hFig;
     if nargout > 1,
