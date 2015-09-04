@@ -11,7 +11,7 @@ Note: various [limitations](#limitations).
 1. image acquisition
   * cine or phase contrast
   * cardiac gated, oversampling expected heart rate
-    - edit control parameter 'physiologic simulation' and R-R
+    - edit control parameters `physiologic simulation` and `R-R`s
   * single slice
   * no long pauses (> R-R) between echoes
 2. save raw .data/.list files
@@ -24,7 +24,7 @@ Note: various [limitations](#limitations).
   * save protocol text file (fig5)
 4. reconstruct using MOG in Matlab
   * navigate to directory containing MOG-Philips or add to Matlab path
-  * run MOG_example
+  * run `mog_example`
 
 ![](Media/data_protocol_export.png)  
 
