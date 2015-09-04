@@ -9,8 +9,10 @@ fetal imaging.
 Note: various [limitations](#limitations).
 
 1. image acquisition
+  * cine or phase contrast
   * cardiac gated, oversampling expected heart rate
-  * “Save raw data” = “yes” on Post/Proc tab
+    - edit control parameter 'physiologic simulation' and R-R
+  * single slice
   * no long pauses (> R-R) between echoes
 2. save raw .data/.list files
   * set postproc > save raw data to 'yes' (fig1)
