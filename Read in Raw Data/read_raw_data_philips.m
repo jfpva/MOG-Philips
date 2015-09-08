@@ -85,6 +85,5 @@ for iAver = 1:NumAverages,
 
     AllData(iAver).Data_Properties.Data             = Data;
     AllData(iAver).Data_Properties.KSpaceProperties = P.kspace_properties;
-    AllData(iAver).Data_Properties.EncodingVelocity = venc;
 
 end
