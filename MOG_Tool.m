@@ -3,12 +3,13 @@ function MOG_Tool
 % Load and read in raw data file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 restart='Yes';
+MSENSE_FLAG=0;
 versionCheck()
 while strcmp(restart,'Yes')
     Data_Properties=Data_Class();
     [filename,path]=uigetfile({'*.dat;*.mat;*.list','MOG Files (*.dat,*.mat,*.list)'});
     if strcmp(filename(end-3:end),'.dat');
-        [Data_Properties.Measurements, Data_Properties.Data, Data_Properties.SiemensOS, Data_Properties.IMAStart] = read_raw_data(path,filename);
+        [Data_Properties.Measurements, Data_Properties.Data, Data_Properties.SiemensOS, Data_Properties.IMAStart, Data_Properties.NoiseScan] = read_raw_data(path,filename);
         % This script reads in protocol info including the target vessel and
         % patient name. Currently tested for Siemens PCMR data at SickKids only. Set variable
         % to 'off' for anonomyzed results
@@ -26,7 +27,13 @@ while strcmp(restart,'Yes')
     Data_Properties.DataType=Determine_Data_Type(Data_Properties.Data);
     Data_Properties.ScanLength=max(max(max(extract_times(Data_Properties.Data))))+10;
     if strcmp(Data_Properties.DataType{2},'GRAPPA')
-        [Data_Properties.Data,Data_Properties.Sampled_Rows]=condense_data(Data_Properties.Data);
+        [Data_Properties.Data,Data_Properties.Sampled_Rows,Data_Properties.GrappaFactor,MSENSE_FLAG]=condense_data(Data_Properties.Data);
+    end
+    if (MSENSE_FLAG==1)
+    Data_Properties.DataType{2}='ZEROS';
+    Data_Properties.DataType{3}='MSENSE';
+    else
+    Data_Properties.DataType{3}='';    
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Select Region of interest for entropy calculations
@@ -74,7 +81,7 @@ while strcmp(restart,'Yes')
             if strcmp(user_input, 'yes') && strcmp(filename(end-3:end),'.dat');
                 clear Data_Properties.Data
                 [Data_Properties.Measurements] = patch_measurement_data(Data_Properties.Measurements, Optimization.RWaveTimes, Data_Properties.SiemensOS);
-                write_raw_data(Data_Properties.Measurements, path, filename, Data_Properties.SiemensOS, Data_Properties.IMAStart);
+                write_raw_data(Data_Properties.Measurements, path, filename, Data_Properties.SiemensOS, Data_Properties.IMAStart,Data_Properties.NoiseScan, Data_Properties.DataType{2});
                 clear('Data_Properties.Measurements')
                 restart=questdlg('Would you like to reconstruct another file?','Analysis Complete','Yes', 'No', 'Yes');
             elseif strcmp(user_input, 'yes') && strcmp(filename(end-3:end),'.mat');

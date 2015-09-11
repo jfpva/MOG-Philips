@@ -20,7 +20,7 @@ rs =     [10 4 3 2 1];
 offset = [35 8 6 4 2];
 nFrames = 10;
 % initialize to some bogus value. Metric doesn't exceed 4
-minmetric = 100;
+minmetric = 1000000;
 
 % keep track of heart rate pairs searched and its corresponding
 % image metric to generate landscape

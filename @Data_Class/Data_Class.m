@@ -16,6 +16,8 @@ classdef Data_Class
         
         Measurements
         
+        NoiseScan
+        
         Protocol
         
         xDimensions
@@ -25,6 +27,8 @@ classdef Data_Class
         PatientType
         
         Trial
+        
+         GrappaFactor
     end
 end
 
