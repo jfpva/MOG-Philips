@@ -39,6 +39,9 @@ hAxes = get(hFig,'currentAxes');
 point=get(hAxes, 'currentpoint');
 handles.last_point=[round(point(1,1)),round(point(1,2))];
 
+dimensions=[7,7];  % TODO: allow user to change dimensions using GUI
+halfdim   =round((dimensions-1)/2); 
+
 guidata(hObject, handles);
 while handles.stop_now~=1 && handles.stop_now~=2
     for iFrame=2:size(Images,3)
@@ -60,11 +63,11 @@ while handles.stop_now~=1 && handles.stop_now~=2
             h=imshow(Images(:,:,iFrame),[]);
             title(handles.Protocol)
             if handles.point(1,1)<size(Images,2)*0.5
-                rectangle('Position',[handles.point(1,1)-5,handles.point(1,2)-5,11,11],'edgecolor','y')
-                rectangle('Position',[size(Images,2)*0.5+handles.point(1,1)-5,+handles.point(1,2)-5,11,11],'edgecolor','y')
+                rectangle('Position',[handles.point(1,1)-halfdim(1),handles.point(1,2)-halfdim(2),dimensions(1),dimensions(2)],'edgecolor','y')
+                rectangle('Position',[size(Images,2)*0.5+handles.point(1,1)-halfdim(1),+handles.point(1,2)-halfdim(2),dimensions(1),dimensions(2)],'edgecolor','y')
             else
-                rectangle('Position',[handles.point(1,1)-5,handles.point(1,2)-5,11,11],'edgecolor','y')
-                rectangle('Position',[-size(Images,2)*0.5+handles.point(1,1)-5,+handles.point(1,2)-5,11,11],'edgecolor','y')
+                rectangle('Position',[handles.point(1,1)-halfdim(1),handles.point(1,2)-halfdim(2),dimensions(1),dimensions(2)],'edgecolor','y')
+                rectangle('Position',[-size(Images,2)*0.5+handles.point(1,1)-halfdim(1),+handles.point(1,2)-halfdim(2),dimensions(1),dimensions(2)],'edgecolor','y')
             end
         end
         handles.last_point=handles.current_point;
@@ -75,9 +78,8 @@ while handles.stop_now~=1 && handles.stop_now~=2
             else
                 coordinates=[round(handles.current_point(1,2)),-size(Images,2)*0.5+round(handles.current_point(1,1))];
             end
-            dimensions=[11,11];
-            varargout{1}=round(coordinates(1,1)-dimensions(1,1)/2):round(coordinates(1,1)+dimensions(1,1)/2);
-            varargout{2}=round(coordinates(1,2)-dimensions(1,2)/2):round(coordinates(1,2)+dimensions(1,2)/2);
+            varargout{1}=round(coordinates(1,1)-halfdim(1)):round(coordinates(1,1)+halfdim(1));
+            varargout{2}=round(coordinates(1,2)-halfdim(2)):round(coordinates(1,2)+halfdim(2));
             varargout{3}=0;
             break
         elseif handles.stop_now==2
