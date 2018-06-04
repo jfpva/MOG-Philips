@@ -50,7 +50,7 @@ for k=1:length(rs)
     
     % two_para_search returns array of structs, each struct
     % containing hr1 and list of hr2s
-    hrs = two_para_search(s1, e1, s2, e2, rs(k));
+    hrs = two_para_search(s1, e1, s2, e2, rs(k), minhr, maxhr);
     
     % this part is hardcoded at the moment
     if k == 1
