@@ -30,4 +30,5 @@ hold on;
 plot(optimalrates(1,1), optimalrates(1,2), 'w+');
 hold on;
 title('Reconstrution Quality','FontSize',14)
+text(min(get(gca,'XLim'))+5,max(get(gca,'YLim'))-5,sprintf('HRs = [%g,%g]',optimalrates(1),optimalrates(2)),'Color',[1,1,1],'FontSize',14,'FontWeight','bold')
 end
