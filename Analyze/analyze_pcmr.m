@@ -1,4 +1,4 @@
-function varargout = analyze_pcmr( patchedMatFilePath, protocolTxtFilePath, dx, dy, venc, nFrames, doRectify, doAlignSystole )
+function varargout = analyze_pcmr( patchedMatFilePath, protocolTxtFilePath, dx, dy, venc, nFrames, doRectify, doAlignSystole, roiMask )
 %ANALYSE_PCMR 
 % 
 
@@ -52,6 +52,11 @@ end
 if ~exist( 'doAlignSystole', 'var' )
     doAlignSystole = true;  
 end
+
+if ~exist( 'roiMask', 'var' )
+    roiMask = [];  
+end
+
 
 % Output Arguments
 if nargout > 0
@@ -145,43 +150,47 @@ nFrames = size(P.Magnitude,3);
 
 %% Get User ROI(s)
 
-hFig = figure;
+if isempty( roiMask )
 
-hFig.MenuBar        = 'none';
-hFig.ToolBar        = 'figure';
-hFig.NumberTitle    = 'off';
-hFig.Name           = 'ROI Selection';
+    hFig = figure;
 
-graphicsToRemove = { 'Save Figure', 'New Figure', 'Open File', ...
-                     'Print Figure', 'Edit Plot', 'Rotate 3D', ...
-                     'Show Plot Tools and Dock Figure', 'Hide Plot Tools', ...
-                     'Insert Legend', 'Insert Colorbar', 'Link Plot', ...
-                     'Brush/Select Data', 'Data Cursor' };
-for iG = 1:length(graphicsToRemove),
-    set(findall(findall(hFig),'ToolTipString',graphicsToRemove{iG}),'Visible','Off');
+    hFig.MenuBar        = 'none';
+    hFig.ToolBar        = 'figure';
+    hFig.NumberTitle    = 'off';
+    hFig.Name           = 'ROI Selection';
+
+    graphicsToRemove = { 'Save Figure', 'New Figure', 'Open File', ...
+                         'Print Figure', 'Edit Plot', 'Rotate 3D', ...
+                         'Show Plot Tools and Dock Figure', 'Hide Plot Tools', ...
+                         'Insert Legend', 'Insert Colorbar', 'Link Plot', ...
+                         'Brush/Select Data', 'Data Cursor' };
+    for iG = 1:length(graphicsToRemove),
+        set(findall(findall(hFig),'ToolTipString',graphicsToRemove{iG}),'Visible','Off');
+    end
+
+    imshow( im, [] ),
+
+    hAx = gca;
+
+    title( 'draw region around vessel of interest' )
+
+    isRegionOk = false;
+
+    while ~isRegionOk
+
+        hRoi = imfreehand( hAx );
+
+        roiMask = hRoi.createMask;
+
+        isRegionOk = strcmp( 'Use', questdlg( 'Use ROI?', 'ROI', 'Use', 'Redraw', 'Redraw' ) );
+
+        hRoi.delete;
+
+    end
+
+    close( hFig ),
+
 end
-
-imshow( im, [] ),
-
-hAx = gca;
-
-title( 'draw region around vessel of interest' )
-
-isRegionOk = false;
-
-while ~isRegionOk
-
-    hRoi = imfreehand( hAx );
-       
-    roiMask = hRoi.createMask;
-    
-    isRegionOk = strcmp( 'Use', questdlg( 'Use ROI?', 'ROI', 'Use', 'Redraw', 'Redraw' ) );
-    
-    hRoi.delete;
-    
-end
-
-close( hFig ),
 
 
 %% Compute Velocity and Flow
@@ -316,6 +325,9 @@ if nargout > 0,
     varargout{1} = hFig;
     if nargout > 1,
         varargout{2} = resultStr;
+        if nargout > 2,
+        varargout{3} = roiMask;
+        end
     end
 end
 
